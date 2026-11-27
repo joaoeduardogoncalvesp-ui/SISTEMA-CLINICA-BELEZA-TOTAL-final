@@ -1,0 +1,35 @@
+services:
+  # Redis usado pela Evolution API (roda na rede do host para facilitar o acesso ao Postgres nativo)
+  redis:
+    image: redis:7-alpine
+    network_mode: host
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Evolution API (WhatsApp). Precisa do banco "evolution" no PostgreSQL nativo.
+  # Crie o banco com: sudo bash scripts/preparar-banco.sh
+  evolution-api:
+    image: evoapicloud/evolution-api:latest
+    network_mode: host
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      SERVER_PORT: 8081
+      SERVER_URL: http://localhost:8081
+      DATABASE_PROVIDER: postgresql
+      DATABASE_CONNECTION_URI: postgresql://${DB_USERNAME:-postgres}:${DB_PASSWORD:-postgres}@localhost:5432/evolution?schema=public
+      CACHE_REDIS_ENABLED: "true"
+      CACHE_REDIS_URI: redis://localhost:6379
+      AUTHENTICATION_API_KEY: ${WHATSAPP_API_KEY:-B22D5427010E-4E41-875E-B841A9497218}
+      AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES: "true"
+      DATABASE_SAVE_DATA_INSTANCE: "true"
+      DATABASE_SAVE_DATA_NEW_MESSAGE: "true"
+      DATABASE_SAVE_MESSAGE_UPDATE: "true"
+      DATABASE_SAVE_DATA_CONTACTS: "true"
+      DATABASE_SAVE_DATA_CHATS: "true"
