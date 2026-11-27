@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel - Clínica Beleza Total</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <div style="padding: 1rem; border-bottom: 1px solid #555;">
+                <h3 style="color: white;">Beleza Total</h3>
+                <p id="userProfile" style="font-size: 0.8rem; color: #ccc;"></p>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#" onclick="showSection('dashboard')" class="active">Dashboard</a></li>
+                <li id="menuClientes"><a href="#" onclick="showSection('clientes')">Clientes</a></li>
+                <li id="menuFuncionarios"><a href="#" onclick="showSection('funcionarios')">Funcionários</a></li>
+                <li id="menuProcedimentos"><a href="#" onclick="showSection('procedimentos')">Procedimentos</a></li>
+                <li id="menuAgendamentos"><a href="#" onclick="showSection('agendamentos')">Agendamentos</a></li>
+                <li id="menuUsuarios"><a href="#" onclick="showSection('usuarios')">Usuários</a></li>
+                <li id="menuHorarios"><a href="#" onclick="showSection('horarios')">Horários</a></li>
+                <li id="menuHistorico"><a href="#" onclick="showSection('historico')">Histórico</a></li>
+                <li id="menuIndicadores"><a href="#" onclick="showSection('indicadores')">Indicadores</a></li>
+                <li id="menuMinhaAgenda"><a href="#" onclick="showSection('minhaAgenda')">Minha Agenda</a></li>
+                <li><a href="#" onclick="auth.logout()">Sair</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <!-- Dashboard -->
+            <div id="sectionDashboard" class="section">
+                <h2>Dashboard</h2>
+                <div class="dashboard-grid">
+                    <div class="stat-card" id="cardStatClientes">
+                        <h3 id="statClientes">0</h3>
+                        <p>Clientes</p>
+                    </div>
+                    <div class="stat-card" id="cardStatFuncionarios">
+                        <h3 id="statFuncionarios">0</h3>
+                        <p>Funcionários</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="statProcedimentos">0</h3>
+                        <p>Procedimentos</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="statAgendamentos">0</h3>
+                        <p>Agendamentos</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clientes -->
+            <div id="sectionClientes" class="section" style="display:none;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Clientes</h2>
+                    <button class="btn btn-primary" onclick="openClienteModal()">+ Novo Cliente</button>
+                </div>
+                <div class="card">
+                    <div style="margin-bottom: 1rem;">
+                        <input type="text" id="clienteSearch" placeholder="Buscar por nome..." oninput="filtrarClientes()" style="width: 100%; padding: 0.6rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.9rem;">
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Telefone</th>
+                                    <th>Email</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clientesTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Funcionários -->
+            <div id="sectionFuncionarios" class="section" style="display:none;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Funcionários</h2>
+                    <button class="btn btn-primary" onclick="openFuncionarioModal()">+ Novo Funcionário</button>
+                </div>
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Telefone</th>
+                                    <th>Especialidade</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="funcionariosTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Procedimentos -->
+            <div id="sectionProcedimentos" class="section" style="display:none;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Procedimentos</h2>
+                    <button class="btn btn-primary" id="btnNovoProcedimento" onclick="openProcedimentoModal()">+ Novo Procedimento</button>
+                </div>
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Categoria</th>
+                                    <th>Duração</th>
+                                    <th>Valor</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="procedimentosTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agendamentos -->
+            <div id="sectionAgendamentos" class="section" style="display:none;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Agendamentos</h2>
+                    <button class="btn btn-primary" id="btnNovoAgendamento" onclick="openAgendamentoModal()">+ Novo Agendamento</button>
+                </div>
+                <div class="card">
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                        <input type="text" id="agendamentoSearch" placeholder="Buscar por cliente..." oninput="filtrarAgendamentos()" style="flex: 1; padding: 0.6rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.9rem;">
+                        <select id="agendamentoStatusFilter" onchange="filtrarAgendamentos()" style="padding: 0.6rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.9rem;">
+                            <option value="">Todos os Status</option>
+                            <option value="AGENDADO">Agendado</option>
+                            <option value="CONFIRMADO">Confirmado</option>
+                            <option value="EM_ATENDIMENTO">Em Atendimento</option>
+                            <option value="REALIZADO">Realizado</option>
+                            <option value="CANCELADO">Cancelado</option>
+                            <option value="NAO_COMPARECEU">Não Compareceu</option>
+                        </select>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Cliente</th>
+                                    <th>Funcionário</th>
+                                    <th>Procedimento</th>
+                                    <th>Data</th>
+                                    <th>Hora</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agendamentosTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Usuários -->
+            <div id="sectionUsuarios" class="section" style="display:none;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Usuários</h2>
+                    <button class="btn btn-primary" onclick="openUsuarioModal()">+ Novo Usuário</button>
+                </div>
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Perfil</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usuariosTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Horários -->
+            <div id="sectionHorarios" class="section" style="display:none;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Horários de Atendimento</h2>
+                    <button class="btn btn-primary" onclick="openHorarioModal()">+ Novo Horário</button>
+                </div>
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Funcionário</th>
+                                    <th>Dia</th>
+                                    <th>Início</th>
+                                    <th>Fim</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="horariosTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Histórico -->
+            <div id="sectionHistorico" class="section" style="display:none;">
+                <h2>Histórico de Agendamentos</h2>
+                <div class="card" style="margin-bottom: 1rem;">
+                    <div style="display: flex; gap: 1rem; align-items: flex-end;">
+                        <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                            <label>Cliente *</label>
+                            <select id="historicoCliente" required></select>
+                        </div>
+                        <button class="btn btn-primary" onclick="buscarHistorico()" style="height: fit-content;">Buscar</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Cliente</th>
+                                    <th>Funcionário</th>
+                                    <th>Procedimento</th>
+                                    <th>Data</th>
+                                    <th>Horário</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historicoTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Indicadores -->
+            <div id="sectionIndicadores" class="section" style="display:none;">
+                <h2>Indicadores e Relatórios</h2>
+                <div class="card" style="margin-bottom: 1rem;">
+                    <div style="display: flex; gap: 1rem; align-items: flex-end;">
+                        <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                            <label>Data Início *</label>
+                            <input type="date" id="indicadorInicio" required>
+                        </div>
+                        <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                            <label>Data Fim *</label>
+                            <input type="date" id="indicadorFim" required>
+                        </div>
+                        <button class="btn btn-primary" onclick="carregarIndicadores()" style="height: fit-content;">Gerar Relatório</button>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid" style="margin-bottom: 1rem;">
+                    <div class="stat-card">
+                        <h3 id="indHoje">0</h3>
+                        <p>Agendamentos Hoje</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="indPeriodo">0</h3>
+                        <p>No Período</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="indRealizados">0</h3>
+                        <p>Realizados</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="indCancelados">0</h3>
+                        <p>Cancelados</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="indPendentes">0</h3>
+                        <p>Pendentes</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="indNaoCompareceram">0</h3>
+                        <p>Não Compareceram</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="indTotalClientes">0</h3>
+                        <p>Total Clientes</p>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="card">
+                        <h3>Atendimentos por Profissional</h3>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Profissional</th>
+                                        <th>Total</th>
+                                        <th>Realizados</th>
+                                        <th>Cancelados</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="indicadorProfissionaisTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Procedimentos Mais Agendados</h3>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Procedimento</th>
+                                        <th>Categoria</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="indicadorProcedimentosTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Minha Agenda -->
+            <div id="sectionMinhaAgenda" class="section" style="display:none;">
+                <h2>Minha Agenda</h2>
+                <div class="card" style="margin-bottom: 1rem;">
+                    <div style="display: flex; gap: 1rem; align-items: flex-end;">
+                        <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                            <label>Filtrar por data</label>
+                            <input type="date" id="minhaAgendaData" onchange="filtrarMinhaAgenda()">
+                        </div>
+                        <button class="btn btn-primary" onclick="carregarMinhaAgenda()" style="height: fit-content;">Mostrar Todos</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Cliente</th>
+                                    <th>Procedimento</th>
+                                    <th>Data</th>
+                                    <th>Horário</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="minhaAgendaTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Cliente -->
+    <div id="clienteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="clienteModalTitle">Novo Cliente</h3>
+                <span class="close" onclick="ui.hideModal('clienteModal')">&times;</span>
+            </div>
+            <form id="clienteForm">
+                <input type="hidden" id="clienteId">
+                <div class="form-group">
+                    <label>Nome *</label>
+                    <input type="text" id="clienteNome" required>
+                </div>
+                <div class="form-group">
+                    <label>Telefone *</label>
+                    <input type="tel" id="clienteTelefone" required>
+                </div>
+                <div class="form-group">
+                    <label>CPF</label>
+                    <input type="text" id="clienteCpf">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="clienteEmail">
+                </div>
+                <div class="form-group">
+                    <label>Data de Nascimento</label>
+                    <input type="date" id="clienteDataNascimento">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="clienteConsentimento" required>
+                        Concordo com o uso dos meus dados (LGPD) *
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Funcionário -->
+    <div id="funcionarioModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="funcionarioModalTitle">Novo Funcionário</h3>
+                <span class="close" onclick="ui.hideModal('funcionarioModal')">&times;</span>
+            </div>
+            <form id="funcionarioForm">
+                <input type="hidden" id="funcionarioId">
+                <div class="form-group">
+                    <label>Nome *</label>
+                    <input type="text" id="funcionarioNome" required>
+                </div>
+                <div class="form-group">
+                    <label>Telefone *</label>
+                    <input type="tel" id="funcionarioTelefone" required>
+                </div>
+                <div class="form-group">
+                    <label>CPF *</label>
+                    <input type="text" id="funcionarioCpf" required>
+                </div>
+                <div class="form-group">
+                    <label>Especialidade</label>
+                    <input type="text" id="funcionarioEspecialidade">
+                </div>
+                <div class="form-group">
+                    <label>Procedimentos Habilitados *</label>
+                    <select id="funcionarioProcedimentos" multiple required></select>
+                </div>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Procedimento -->
+    <div id="procedimentoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="procedimentoModalTitle">Novo Procedimento</h3>
+                <span class="close" onclick="ui.hideModal('procedimentoModal')">&times;</span>
+            </div>
+            <form id="procedimentoForm">
+                <input type="hidden" id="procedimentoId">
+                <div class="form-group">
+                    <label>Nome *</label>
+                    <input type="text" id="procedimentoNome" required>
+                </div>
+                <div class="form-group">
+                    <label>Descrição *</label>
+                    <textarea id="procedimentoDescricao" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Duração (minutos) *</label>
+                    <input type="number" id="procedimentoDuracao" required>
+                </div>
+                <div class="form-group">
+                    <label>Valor (R$)</label>
+                    <input type="number" id="procedimentoValor" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Categoria *</label>
+                    <select id="procedimentoCategoria" required>
+                        <option value="FACIAL">Facial</option>
+                        <option value="CORPORAL">Corporal</option>
+                        <option value="CAPILAR">Capilar</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Agendamento -->
+    <div id="agendamentoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="agendamentoModalTitle">Novo Agendamento</h3>
+                <span class="close" onclick="ui.hideModal('agendamentoModal')">&times;</span>
+            </div>
+            <form id="agendamentoForm">
+                <input type="hidden" id="agendamentoId">
+                <div class="form-group">
+                    <label>Cliente *</label>
+                    <select id="agendamentoCliente" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Procedimento *</label>
+                    <select id="agendamentoProcedimento" required onchange="carregarFuncionariosPorProcedimento()"></select>
+                </div>
+                <div class="form-group">
+                    <label>Funcionário *</label>
+                    <select id="agendamentoFuncionario" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Data *</label>
+                    <input type="date" id="agendamentoData" required>
+                </div>
+                <div class="form-group">
+                    <label>Hora Início *</label>
+                    <input type="time" id="agendamentoHora" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Usuário -->
+    <div id="usuarioModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="usuarioModalTitle">Novo Usuário</h3>
+                <span class="close" onclick="ui.hideModal('usuarioModal')">&times;</span>
+            </div>
+            <form id="usuarioForm">
+                <input type="hidden" id="usuarioId">
+                <div class="form-group">
+                    <label>Nome *</label>
+                    <input type="text" id="usuarioNome" required>
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="usuarioEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Senha *</label>
+                    <input type="password" id="usuarioSenha">
+                </div>
+                <div class="form-group">
+                    <label>Perfil *</label>
+                    <select id="usuarioPerfil" required>
+                        <option value="ADMIN">Administrador</option>
+                        <option value="ESTETICISTA_ADMINISTRADORA">Esteticista Administradora</option>
+                        <option value="RECEPCIONISTA">Recepcionista</option>
+                        <option value="FUNCIONARIO">Funcionário</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Funcionário vinculado (obrigatório para perfil Funcionário)</label>
+                    <select id="usuarioFuncionario">
+                        <option value="">— Nenhum —</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Horário -->
+    <div id="horarioModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="horarioModalTitle">Novo Horário</h3>
+                <span class="close" onclick="ui.hideModal('horarioModal')">&times;</span>
+            </div>
+            <form id="horarioForm">
+                <input type="hidden" id="horarioId">
+                <div class="form-group">
+                    <label>Funcionário *</label>
+                    <select id="horarioFuncionario" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Dia da Semana *</label>
+                    <select id="horarioDia" required>
+                        <option value="MONDAY">Segunda-feira</option>
+                        <option value="TUESDAY">Terça-feira</option>
+                        <option value="WEDNESDAY">Quarta-feira</option>
+                        <option value="THURSDAY">Quinta-feira</option>
+                        <option value="FRIDAY">Sexta-feira</option>
+                        <option value="SATURDAY">Sábado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Hora Início *</label>
+                    <input type="time" id="horarioInicio" required>
+                </div>
+                <div class="form-group">
+                    <label>Hora Fim *</label>
+                    <input type="time" id="horarioFim" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Atualizar Status -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Atualizar Status do Agendamento</h3>
+                <span class="close" onclick="ui.hideModal('statusModal')">&times;</span>
+            </div>
+            <form id="statusForm">
+                <input type="hidden" id="statusAgendamentoId">
+                <div class="form-group">
+                    <label>Novo Status *</label>
+                    <select id="statusSelect" required>
+                        <option value="">Selecione...</option>
+                        <option value="AGENDADO">Agendado</option>
+                        <option value="CONFIRMADO">Confirmado</option>
+                        <option value="EM_ATENDIMENTO">Em Atendimento</option>
+                        <option value="REALIZADO">Realizado</option>
+                        <option value="CANCELADO">Cancelado</option>
+                        <option value="NAO_COMPARECEU">Não Compareceu</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Salvar Status</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

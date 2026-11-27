@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Clínica Beleza Total</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h2>Clínica Beleza Total</h2>
+            <div id="alert"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" required placeholder="Sua senha">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Entrar</button>
+            </form>
+            <p style="text-align: center; margin-top: 1rem;">
+                <a href="index.html">Voltar para o início</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+            const alertDiv = document.getElementById('alert');
+            
+            try {
+                const data = await auth.login(email, senha);
+                if (data) {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alertDiv.innerHTML = '<div class="alert alert-error">Credenciais inválidas</div>';
+                }
+            } catch (error) {
+                alertDiv.innerHTML = `<div class="alert alert-error">${error.message || 'Erro ao fazer login'}</div>`;
+            }
+        });
+
+        // Redirect if already authenticated
+        if (auth.isAuthenticated()) {
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+</body>
+</html>
